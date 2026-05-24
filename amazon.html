@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f9;
+      }
+      .side-menu {
+        width: 250px;
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+        height: 100%;
+        position: fixed;
+      }
+      .side-menu h2 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .side-menu a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin: 5px 0;
+        background: #34495e;
+        border-radius: 4px;
+        text-align: left;
+        padding-left: 30px;
+        position: relative;
+      }
+      .side-menu a i {
+        position: absolute;
+        left: 10px;
+        top: 12px;
+      }
+      .side-menu a:hover {
+        background: #007bff;
+      }
+      .dropdown-btn {
+        cursor: pointer;
+      }
+      .dropdown-container {
+        display: none;
+        padding-left: 20px;
+      }
+      .dropdown-container a {
+        padding-left: 40px;
+      }
+      .main-content {
+        margin-left: 250px;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .otp-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 350px;
+      }
+      .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 20px 0;
+      }
+      .otp-inputs input {
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        font-size: 18px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .resend-btn {
+        background: #6c757d;
+      }
+      .timer {
+        color: #6c757d;
+        font-size: 14px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="side-menu">
+      <h2>Menu</h2>
+      <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="#"><i class="fas fa-user"></i> Profile</a>
+      <button class="dropdown-btn">
+        <i class="fas fa-cog"></i> Settings <i class="fas fa-caret-down"></i>
+      </button>
+      <div class="dropdown-container">
+        <a href="#"><i class="fas fa-user-cog"></i> Account</a>
+        <a href="#"><i class="fas fa-shield-alt"></i> Security</a>
+      </div>
+      <a href="#" class="active"
+        ><i class="fas fa-lock"></i> OTP Verification</a
+      >
+      <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+      <div class="otp-container">
+        <h2>Enter O.T.P</h2>
+        <form id="otpForm">
+          <div class="otp-inputs">
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]"
+              required
+              size="1"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]"
+              required
+              size="1"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]"
+              required
+              size="1"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]"
+              required
+              size="1"
+            />
+          </div>
+          <br />
+          <button type="submit">Verify O.T.P</button>
+          <button type="button" class="resend-btn" id="resendBtn">
+            Resend OTP
+          </button>
+          <div class="timer" id="timer">Resend in 30s</div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Dropdown functionality
+      const dropdownBtn = document.querySelector(".dropdown-btn");
+      const dropdownContainer = document.querySelector(".dropdown-container");
+      dropdownBtn.addEventListener("click", () => {
+        dropdownContainer.style.display =
+          dropdownContainer.style.display === "block" ? "none" : "block";
+      });
+
+      // OTP input auto-focus
+      const inputs = document.querySelectorAll(".otp-inputs input");
+      inputs.forEach((input, index) => {
+        input.addEventListener("input", (e) => {
+          if (e.target.value.length === 1) {
+            if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+          }
+        });
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && e.target.value.length === 0) {
+            if (index > 0) {
+              inputs[index - 1].focus();
+            }
+          }
+        });
+      });
+
+      // Resend OTP timer
+      let timeLeft = 30;
+      const timerElement = document.getElementById("timer");
+      const resendBtn = document.getElementById("resendBtn");
+      resendBtn.disabled = true;
+
+      const countdown = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `Resend in ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          timerElement.textContent = "";
+          resendBtn.disabled = false;
+        }
+      }, 1000);
+
+      resendBtn.addEventListener("click", () => {
+        alert("OTP resent!");
+        timeLeft = 30;
+        resendBtn.disabled = true;
+        const newCountdown = setInterval(() => {
+          timeLeft--;
+          timerElement.textContent = `Resend in ${timeLeft}s`;
+          if (timeLeft <= 0) {
+            clearInterval(newCountdown);
+            timerElement.textContent = "";
+            resendBtn.disabled = false;
+          }
+        }, 1000);
+      });
+
+      // Form submission
+      document.getElementById("otpForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const otp = Array.from(inputs)
+          .map((input) => input.value)
+          .join("");
+        alert(`OTP entered: ${otp}`);
+        // Add your OTP verification logic here
+      });
+    </script>
+  </body>
+</html>
